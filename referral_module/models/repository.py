@@ -26,18 +26,22 @@ class UsersRepository:
         return user.to_json()
 
     async def get_users_referral(self, id: int):
-        referrals = await self._session.execute(select(Users).where(Users.referr_id == id))
+        referrals = await self._session.execute(
+            select(Users).where(Users.referr_id == id)
+        )
         referrals = referrals.scalars().all()
         return [referral.to_json() for referral in referrals]
 
     async def create_user(self, email, hashed_password=None, referr_id=None):
-        new_user = Users(email=email, hashed_password=hashed_password, referr_id=referr_id)
+        new_user = Users(
+            email=email, hashed_password=hashed_password, referr_id=referr_id
+        )
         self._session.add(new_user)
         try:
             await self._session.commit()
             return new_user.to_json()
         except DBAPIError as exc:
-            raise Exception(f'{exc.detail}')
+            raise Exception(f"{exc.detail}")
 
 
 class CodesRepository:
@@ -47,7 +51,10 @@ class CodesRepository:
 
     async def get_code_by_user_id(self, user_id: int):
         code = await self._session.execute(
-            select(Codes).where(Codes.user_id == user_id, Codes.expired_date > func.now()))
+            select(Codes).where(
+                Codes.user_id == user_id, Codes.expired_date > func.now()
+            )
+        )
         code = code.scalars().first()
         if not code:
             return {}
@@ -60,18 +67,18 @@ class CodesRepository:
             await self._session.commit()
             return new_code.to_json()
         except DBAPIError as exc:
-            raise Exception(f'{exc.detail}')
+            raise Exception(f"{exc.detail}")
 
     async def delete_code(self, id: int):
         code = await self._session.execute(select(Codes).where(Codes.id == id))
         code = code.scalars().first()
         if not code:
-            raise Exception('No this referral code in database.')
+            raise Exception("No this referral code in database.")
         try:
             await self._session.delete(code)
             return True
         except DBAPIError as exc:
-            raise Exception(f'{exc.detail}')
+            raise Exception(f"{exc.detail}")
 
     async def get_code_by_ref_code(self, code: str):
         code = await self._session.execute(select(Codes).where(Codes.code == code))
@@ -80,7 +87,7 @@ class CodesRepository:
             return {}
         return code.to_json()
 
-    async def get_code_by_id(self, id:int):
+    async def get_code_by_id(self, id: int):
         code = await self._session.execute(select(Codes).where(Codes.id == id))
         code = code.scalars().first()
         if not code:

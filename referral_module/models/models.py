@@ -26,8 +26,10 @@ class Codes(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
     def to_json(self):
-        data = {'id': self.id,
-                'code': self.code,
-                'expired_date': str(self.expired_date),
-                'user_id': self.user_id}
+        data = {
+            "id": self.id,
+            "code": self.code,
+            "expired_date": str(self.expired_date),
+            "user_id": self.user_id,
+        }
         return data
